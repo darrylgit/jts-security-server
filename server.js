@@ -6,16 +6,28 @@ const morgan = require('morgan');
 
 const bodyParser = require('body-parser');
 const app = express();
-app.use(cors());
+
 app.use(helmet());
 app.use(morgan('tiny'));
 app.use(bodyParser.json());
 
+var whitelist = [
+  'http://example1.com',
+  'http://example2.com',
+  'https://danieljwagener.github.io'
+];
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+app.use(cors(corsOptions));
+
 app.get('/', (req, res) => {
-  res.cookie('session', '1', { httpOnly: true, secure: true });
-  res.set({
-    'Content-Security-Policy': "script-src 'self' 'https://apis.google.com'"
-  });
   res.send('Hello World!');
 });
 
