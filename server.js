@@ -11,7 +11,13 @@ app.use(helmet());
 app.use(morgan('tiny'));
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => res.send('Hello World!'));
+app.get('/', (req, res) => {
+  res.cookie('session', '1', { httpOnly: true, secure: true });
+  res.set({
+    'Content-Security-Policy': "script-src 'self' 'https://apis.google.com'"
+  });
+  res.send('Hello World!');
+});
 
 app.post('/secret', (req, res) => {
   const { userInput } = req.body;
